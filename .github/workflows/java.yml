@@ -3,7 +3,7 @@ name: Java build with Maven + service deployment on host
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "main" ]
 
 jobs:
   build:
