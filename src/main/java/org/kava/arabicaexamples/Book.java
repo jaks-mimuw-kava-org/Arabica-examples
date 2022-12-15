@@ -1,4 +1,4 @@
-package org.arabicaexamples;
+package org.kava.arabicaexamples;
 
 import java.io.Serial;
 import java.io.Serializable;

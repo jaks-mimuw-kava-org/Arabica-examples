@@ -1,4 +1,4 @@
-package org.arabicaexamples;
+package org.kava.arabicaexamples;
 
 import org.kava.arabica.http.ArabicaHttpRequest;
 import org.kava.arabica.http.ArabicaHttpResponse;
@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static org.arabicaexamples.Book.quote;
 
 @ArabicaServletURI("/library")
 public class LibraryServlet extends ArabicaServlet {
@@ -45,7 +44,7 @@ public class LibraryServlet extends ArabicaServlet {
             String[] kvs = body.split("[&=]");
             StringBuilder json = new StringBuilder("{");
             for (int i = 0; i < kvs.length; i += 2) {
-                json.append(quote(kvs[i])).append(":").append(quote(kvs[i + 1]));
+                json.append(Book.quote(kvs[i])).append(":").append(Book.quote(kvs[i + 1]));
                 if (i + 2 < kvs.length) {
                     json.append(",");
                 }

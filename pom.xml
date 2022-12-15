@@ -68,7 +68,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>${jar.deps.path}</classpathPrefix>
                             <mainClass>
-                                com.example.Application
+                                org.kava.arabicaexamples.ServletContainerExample
                             </mainClass>
                         </manifest>
                     </archive>
