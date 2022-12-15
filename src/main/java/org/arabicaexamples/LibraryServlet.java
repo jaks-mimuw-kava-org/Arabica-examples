@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.model.Book.quote;
 import static java.lang.String.format;
+import static org.arabicaexamples.Book.quote;
 
 @ArabicaServletURI("/library")
 public class LibraryServlet extends ArabicaServlet {
@@ -40,23 +40,27 @@ public class LibraryServlet extends ArabicaServlet {
 
     @Override
     public void doPOST(ArabicaHttpRequest request, ArabicaHttpResponse response) {
-        var body = request.body();
-        String[] kvs = body.split("[&=]");
-        StringBuilder json = new StringBuilder("{");
-        for (int i = 0; i < kvs.length; i+= 2) {
-            json.append(quote(kvs[i])).append(":").append(quote(kvs[i + 1]));
-            if (i + 2 < kvs.length) {
-                json.append(",");
+        try {
+            var body = request.bodyAsString();
+            String[] kvs = body.split("[&=]");
+            StringBuilder json = new StringBuilder("{");
+            for (int i = 0; i < kvs.length; i += 2) {
+                json.append(quote(kvs[i])).append(":").append(quote(kvs[i + 1]));
+                if (i + 2 < kvs.length) {
+                    json.append(",");
+                }
             }
+            json.append("}");
+
+            var book = Book.fromJSON(json.toString());
+            books.add(book);
+
+            response.setStatusCode(200);
+            response.setRequest(request);
+            response.setBody("<h1>Added!</h1><a href=\"/library\">Go back!</a>");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         }
-        json.append("}");
-
-        var book = Book.fromJSON(json.toString());
-        books.add(book);
-
-        response.setStatusCode(200);
-        response.setRequest(request);
-        response.setBody("<h1>Added!</h1><a href=\"/library\">Go back!</a>");
     }
 
     public LibraryServlet() {
