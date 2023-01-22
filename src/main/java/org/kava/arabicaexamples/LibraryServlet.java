@@ -61,7 +61,7 @@ public class LibraryServlet extends HttpServlet {
             var outBody = "<h1>Added!</h1><a href=\"/library\">Go back!</a>";
 
             resp.setStatus(200);
-            resp.setContentType("text/plain");
+            resp.setContentType("text/html");
             resp.setContentLength(outBody.length());
             resp.getOutputStream().write(outBody.getBytes());
         } catch (UnsupportedEncodingException e) {
