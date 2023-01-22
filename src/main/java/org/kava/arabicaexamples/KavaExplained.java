@@ -1,22 +1,21 @@
 package org.kava.arabicaexamples;
 
-import org.kava.arabica.http.ArabicaHttpRequest;
-import org.kava.arabica.http.ArabicaHttpResponse;
-import org.kava.arabica.servlet.ArabicaServlet;
-import org.kava.arabica.servlet.ArabicaServletURI;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.kava.arabica.utils.StaticReader;
 
-@ArabicaServletURI("/info")
-public class KavaExplained extends ArabicaServlet {
-    @Override
-    public void doGET(ArabicaHttpRequest request, ArabicaHttpResponse response) {
-        response.setBody(StaticReader.readFileFromResources("static/welcome.html"));
-        response.setStatusCode(200);
-        response.setRequest(request);
-    }
+import java.io.IOException;
 
+@WebServlet("/info")
+public class KavaExplained extends HttpServlet {
     @Override
-    public void doPOST(ArabicaHttpRequest request, ArabicaHttpResponse response) {
-        throw new UnsupportedOperationException();
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        var body = StaticReader.readFileFromResources("static/welcome.html");
+        resp.getOutputStream().write(body.getBytes());
+        resp.setContentLength(body.length());
+        resp.setContentType("text/html");
+        resp.setStatus(200);
     }
 }

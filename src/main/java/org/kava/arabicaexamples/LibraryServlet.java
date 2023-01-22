@@ -1,9 +1,10 @@
 package org.kava.arabicaexamples;
 
-import org.kava.arabica.http.ArabicaHttpRequest;
-import org.kava.arabica.http.ArabicaHttpResponse;
-import org.kava.arabica.servlet.ArabicaServlet;
-import org.kava.arabica.servlet.ArabicaServletURI;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.kava.arabica.utils.StaticReader;
 import org.kava.lungo.Logger;
 import org.kava.lungo.LoggerFactory;
@@ -16,31 +17,34 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
-@ArabicaServletURI("/library")
-public class LibraryServlet extends ArabicaServlet {
+@WebServlet("/library")
+public class LibraryServlet extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(LibraryServlet.class);
 
     private List<Book> books = new ArrayList<>();
 
     @Override
-    public void doGET(ArabicaHttpRequest request, ArabicaHttpResponse response) {
-        response.setStatusCode(200);
-        response.setRequest(request);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setStatus(200);
 
         String allBooks = books.stream()
                 .map(book -> format("<li>[%s] <b>%s</b></li>", book.author(), book.getTruncatedName()))
                 .collect(Collectors.joining());
 
         String form = StaticReader.readFileFromResources("static/book_form.html");
+        String body = format("<h2>Books:</h2><ul>%s</ul>%s", allBooks, form);
 
-        response.setBody(format("<h2>Books:</h2><ul>%s</ul>%s", allBooks, form));
+        resp.setContentType("text/html");
+        resp.setContentLength(body.length());
+        resp.getOutputStream().write(body.getBytes());
     }
 
     @Override
-    public void doPOST(ArabicaHttpRequest request, ArabicaHttpResponse response) {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            var body = request.bodyAsString();
+            var rawBody = req.getInputStream().readAllBytes();
+            var body = new String(rawBody);
             String[] kvs = body.split("[&=]");
             StringBuilder json = new StringBuilder("{");
             for (int i = 0; i < kvs.length; i += 2) {
@@ -54,9 +58,12 @@ public class LibraryServlet extends ArabicaServlet {
             var book = Book.fromJSON(json.toString());
             books.add(book);
 
-            response.setStatusCode(200);
-            response.setRequest(request);
-            response.setBody("<h1>Added!</h1><a href=\"/library\">Go back!</a>");
+            var outBody = "<h1>Added!</h1><a href=\"/library\">Go back!</a>";
+
+            resp.setStatus(200);
+            resp.setContentType("text/plain");
+            resp.setContentLength(outBody.length());
+            resp.getOutputStream().write(outBody.getBytes());
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
